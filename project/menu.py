@@ -1,51 +1,27 @@
 """
-Меню выбора режима обработки через match-case.
+Меню выбора материала.
 """
-
 from __future__ import annotations
 
-from connstans import K_COARSE, K_SEMI, K_FINISH
+from constants import STEEL_DENSITY, ALUMINUM_DENSITY, COPPER_DENSITY
 
 
-def show_menu() -> None:
-    """Вывести меню режимов."""
-    print("\n Выберите режим обработки:")
-    print("  1 — черновая обработка (k = 1.0)")
-    print("  2 — получистовая      (k = 0.85)")
-    print("  3 — чистовая          (k = 0.7)")
-    print("  0 — выход")
-
-
-def select_mode() -> float | None:
+def choose_material() -> tuple[str, float]:
     """
-    Циклически запрашивать режим и возвращать коэффициент k.
-
-    Использует match-case для маршрутизации.
-    Возвращает None, если выбран выход (0).
+    Предложить выбрать материал. Возвращает (название, плотность).
     """
+    print("Выберите материал:")
+    print("1 — Сталь")
+    print("2 — Алюминий")
+    print("3 — Медь")
+
     while True:
-        choice = input("Введите номер режима (от 0 до 3): ").strip()
-        match choice:
-            case "1":
-                return K_COARSE
-            case "2":
-                return K_SEMI
-            case "3":
-                return K_FINISH
-            case "0":
-                return None
-            case _:
-                print("Ошибка: неверный пункт меню. Повторите ввод.")
-
-
-def mode_name(k: float) -> str:
-    """Вернуть название режима по коэффициенту k."""
-    match k:
-        case 1.0:
-            return "черновая"
-        case 0.85:
-            return "получистовая"
-        case 0.7:
-            return "чистовая"
-        case _:
-            return "неизвестный"
+        choice = input("Номер материала (1..3): ").strip()
+        if choice == "1":
+            return "Сталь", STEEL_DENSITY
+        elif choice == "2":
+            return "Алюминий", ALUMINUM_DENSITY
+        elif choice == "3":
+            return "Медь", COPPER_DENSITY
+        else:
+            print("Ошибка: введите 1, 2 или 3.")

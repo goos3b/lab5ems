@@ -1,33 +1,47 @@
-
-from validation import input_diameter, input_frequency
-from menu import show_menu, select_mode, mode_name
-from operations import cutting_speed, adjusted_speed, diameter_class
+"""
+Точка входа: ввод данных, расчёт массы, вывод результата.
+Запускать ТОЛЬКО этот файл: python main.py
+"""
+from constants import STEEL_DENSITY
+from logger import clear
+from operations import calculate_mass, get_material_name, thickness_class
+from input_validation import (
+    input_length,
+    input_width,
+    input_thickness,
+    input_quantity,
+)
+from menu import choose_material
 
 
 def main() -> None:
-    """Главный сценарий."""
-    print("=== Расчёт скорости резания при токарной обработке ===")
+    clear()  # очищаем журнал ошибок перед новым запуском
 
-    while True:
-        show_menu()
-        k = select_mode()
-        if k is None:
-            print("Работа завершена.")
-            break
+    print("--- Расчёт массы партии листов ---")
+    print()
 
-        d = input_diameter()
-        n = input_frequency()
+    # 1. Выбор материала (название + плотность)
+    material_name, rho = choose_material()
 
-        v = cutting_speed(d, n)
-        v_adj = adjusted_speed(v, k)
-        cls = diameter_class(d)
+    # 2. Ввод размеров и количества
+    l = input_length()
+    w = input_width()
+    t = input_thickness()
+    q = input_quantity()
 
-        print("\n Результаты ")
-        print(f"Режим:        {mode_name(k)} (k = {k})")
-        print(f"V (скорость резания):      {v:.2f} м/мин")
-        print(f"V_adj (скорректированная): {v_adj:.2f} м/мин")
-        print(f"Класс диаметра: {cls}")
-        print("\n")
+    # 3. Расчёты
+    mass = calculate_mass(l, w, t, rho, q)
+    t_class = thickness_class(t)
+    material_by_rho = get_material_name(rho)
+
+    # 4. Вывод результата
+    print()
+    print("--- Результат ---")
+    print(f"Материал:          {material_name}, плотность {rho} кг/м³")
+    print(f"Размеры листа:     {l} м × {w} м × {t} мм")
+    print(f"Количество:        {q} шт")
+    print(f"Класс толщины:     {t_class}")
+    print(f"Масса партии:      {mass:.2f} кг")
 
 
 if __name__ == "__main__":

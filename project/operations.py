@@ -1,65 +1,58 @@
 """
-Расчёты: скорость резания V, скорректированная V_adj, класс диаметра.
+Расчёты: масса партии листов, название материала, класс толщины.
 """
+from __future__ import annotations
 
 from typing import Annotated
 
-from connstans import PI, D_SMALL_LIMIT, D_LARGE_LIMIT
+from constants import (
+    STEEL_DENSITY,
+    ALUMINUM_DENSITY,
+    COPPER_DENSITY,
+    T_THIN_LIMIT,
+    T_THICK_LIMIT,
+)
 
 
-def cutting_speed(
-    d: Annotated[float, "Диаметр заготовки, мм"],
-    n: Annotated[float, "Частота вращения, об/мин"],
+def calculate_mass(
+    l: Annotated[float, "Длина листа, м"],
+    w: Annotated[float, "Ширина листа, м"],
+    t: Annotated[float, "Толщина листа, мм"],
+    rho: Annotated[float, "Плотность материала, кг/м³"],
+    q: Annotated[int, "Количество листов, шт"],
 ) -> float:
     """
-    Рассчитать скорость резания V = π · D · n / 1000, м/мин.
-
-    Args:
-        d: диаметр заготовки, мм.
-        n: частота вращения, об/мин.
-
-    Returns:
-        Скорость резания, м/мин.
+    Рассчитать массу партии листов:
+    m = L · W · (t / 1000) · ρ · Q, кг.
     """
-    return PI * d * n / 1000.0
+    return l * w * (t / 1000.0) * rho * q
 
 
-def adjusted_speed(
-    v: Annotated[float, "Скорость резания, м/мин"],
-    k: Annotated[float, "Коэффициент режима"],
-) -> float:
+def get_material_name(rho: Annotated[float, "Плотность материала, кг/м³"]) -> str:
     """
-    Скорректированная скорость V_adj = V · k.
-
-    Args:
-        v: скорость резания, м/мин.
-        k: коэффициент режима.
-
-    Returns:
-        Скорректированная скорость, м/мин.
+    Определить название материала по плотности через if-elif-else.
     """
-    return v * k
-
-
-def diameter_class(
-    d: Annotated[float, "Диаметр, мм"],
-) -> str:
-    """
-    Классифицировать диаметр через if-elif-else.
-
-    D < 10 — малый диаметр;
-    10 ≤ D ≤ 100 — нормальный диаметр;
-    D > 100 — крупный диаметр.
-
-    Args:
-        d: диаметр, мм.
-
-    Returns:
-        Строка с названием класса диаметра.
-    """
-    if d < D_SMALL_LIMIT:
-        return "малый диаметр"
-    elif d <= D_LARGE_LIMIT:
-        return "нормальный диаметр"
+    if rho == STEEL_DENSITY:
+        return "Сталь"
+    elif rho == ALUMINUM_DENSITY:
+        return "Алюминий"
+    elif rho == COPPER_DENSITY:
+        return "Медь"
     else:
-        return "крупный диаметр"
+        return "Неизвестный материал"
+
+
+def thickness_class(t: Annotated[float, "Толщина листа, мм"]) -> str:
+    """
+    Классифицировать толщину листа через if-elif-else.
+
+    t < 0.5 — тонкий лист;
+    0.5 ≤ t ≤ 5.0 — нормальная толщина;
+    t > 5.0 — толстый лист.
+    """
+    if t < T_THIN_LIMIT:
+        return "тонкий лист"
+    elif t <= T_THICK_LIMIT:
+        return "нормальная толщина"
+    else:
+        return "толстый лист"
